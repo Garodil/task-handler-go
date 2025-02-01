@@ -114,9 +114,11 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		todo.Reset()
 	}
 
-	if request.Title != "" {
-		todo.Rename(request.Title)
+	if request.Title == "" {
+		RespondError(w, http.StatusBadRequest, "'title' пуст")
+		return
 	}
+	todo.Rename(request.Title)
 
 	Respond(w, http.StatusOK, map[string]string{"ok": "true"})
 }
