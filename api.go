@@ -15,6 +15,7 @@ type PostRequest struct {
 	Title string `json:"title"`
 }
 
+// Класс PUT запроса
 type PutRequest struct {
 	*MainRequest
 	Title     string `json:"title"`
@@ -39,7 +40,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	err := request.Decode(r.Body, &request)
 	if err != nil {
 		log.Println("ошибка парса тела запроса " + err.Error())
-		RespondError(w, http.StatusInternalServerError, "ошибка парса")
+		RespondError(w, http.StatusBadRequest, "ошибка парса")
 		return
 	}
 

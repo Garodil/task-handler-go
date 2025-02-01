@@ -20,8 +20,12 @@ func (request *MainRequest) Decode(body io.ReadCloser, result any) error {
 }
 
 // Десериализация из json в result
-func FormatJson(input []byte, result any) {
-	json.Unmarshal(input, &result)
+func FormatJson(input []byte, result any) error {
+	err := json.Unmarshal(input, &result)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Сериализация в json
