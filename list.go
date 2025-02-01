@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+var List = CreateTodoList()
+
 // Класс списка задач
 type list struct {
 	sync.Mutex        // Мьютекс для последовательных добавлений в список в случае параллельных запросов

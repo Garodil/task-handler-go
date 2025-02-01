@@ -12,14 +12,14 @@ type MainRequest struct{}
 // Класс POST запроса
 type PostRequest struct {
 	*MainRequest
-	Title string `json:"title"`
+	Title string `json:"title"` // Название задачи
 }
 
 // Класс PUT запроса
 type PutRequest struct {
 	*MainRequest
-	Title     string `json:"title"`
-	Completed string `json:"completed"`
+	Title     string `json:"title"`     // Новое название для задачи
+	Completed string `json:"completed"` // Должно быть true или false
 }
 
 // Отправляет все задачи в клиент
@@ -89,7 +89,13 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	err := request.Decode(r.Body, &request)
 	if err != nil {
 		log.Println("ошибка парса тела запроса " + err.Error())
-		RespondError(w, http.StatusInternalServerError, "ошибка парса")
+		RespondError(w, http.StatusBadRequest, "ошибка парса")
+		return
+	}
+
+	if request.Title == "" && request.Completed == "" {
+		log.Println("пустой запрос")
+		RespondError(w, http.StatusBadRequest, "пустое тело запроса")
 		return
 	}
 
@@ -106,19 +112,21 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Валидация
+
 	todo := List.Find(todoId)
 
 	if request.Completed == "true" {
 		todo.Complete()
 	} else if request.Completed == "false" {
 		todo.Reset()
+	} else if request.Completed != "" {
+		RespondError(w, http.StatusBadRequest, "неверное значение 'completed'")
 	}
 
-	if request.Title == "" {
-		RespondError(w, http.StatusBadRequest, "'title' пуст")
-		return
+	if request.Title != "" {
+		todo.Rename(request.Title)
 	}
-	todo.Rename(request.Title)
 
 	Respond(w, http.StatusOK, map[string]string{"ok": "true"})
 }
