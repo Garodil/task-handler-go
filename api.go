@@ -6,32 +6,11 @@ import (
 	"strconv"
 )
 
-// Основной класс запроса
-type MainRequest struct{}
-
-// Класс POST запроса
-type PostRequest struct {
-	*MainRequest
-	Title string `json:"title"` // Название задачи
-}
-
-// Класс PUT запроса
-type PutRequest struct {
-	*MainRequest
-	Title     string `json:"title"`     // Новое название для задачи
-	Completed string `json:"completed"` // Должно быть true или false
-}
-
 // Отправляет все задачи в клиент
 func Get(w http.ResponseWriter, r *http.Request) {
 	list := List.Get()
-	json := ParseJson(list)
 
-	w.Header().Set("Content-Type", "application/json")
-	_, err := w.Write(json)
-	if err != nil {
-		log.Println(err)
-	}
+	Respond(w, http.StatusOK, list)
 }
 
 // Создаёт новую задачу по запросу от клиента
@@ -56,7 +35,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	Respond(w, http.StatusCreated, map[string]string{"id": todo.Get()["id"]})
 }
 
-// Отправляет одну задачу по идентификатору
+// Отправляет одну задачу по идентификатору на клиент
 func GetById(w http.ResponseWriter, r *http.Request) {
 	pathId := r.PathValue("id")
 
@@ -82,6 +61,7 @@ func GetById(w http.ResponseWriter, r *http.Request) {
 	Respond(w, http.StatusOK, todo.Get())
 }
 
+// Изменяет задание
 func Put(w http.ResponseWriter, r *http.Request) {
 	pathId := r.PathValue("id")
 
@@ -112,7 +92,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Валидация
+	// Валидация Completed
 
 	todo := List.Find(todoId)
 
@@ -131,6 +111,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	Respond(w, http.StatusOK, map[string]string{"ok": "true"})
 }
 
+// Удаляет задание
 func Delete(w http.ResponseWriter, r *http.Request) {
 	pathId := r.PathValue("id")
 

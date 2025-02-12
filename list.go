@@ -62,6 +62,8 @@ func (l *list) Find(id int) *todo {
 
 // Осуществляет линейный поиск на задачу по идентификатору и удаляет её
 func (l *list) Delete(id int) error {
+	l.Lock()
+	defer l.Unlock()
 	for index := range l.todos {
 		if id == l.todos[index].id {
 			l.todos = append(l.todos[:index], l.todos[index+1:]...)
